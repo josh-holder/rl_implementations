@@ -19,7 +19,7 @@ class TabularQLearnAgent(object):
     def initQFuncFromStatesActions(self,states,actions, init_val=0):
         """
         Initializes Agent's Q function to a specified value at all
-        state action pairs
+        state action pairs.
         """
         self.q_func = {}
         for action in actions:
@@ -118,6 +118,8 @@ class TabularQLearnAgent(object):
                 num_states += 1
                 total_reward += reward
 
+            print(f"Episode {episode} with reward {total_reward}")
+            
             rewards.append(total_reward)
             lengths.append(num_states)
             
@@ -128,34 +130,33 @@ class TabularQLearnAgent(object):
     def observeAgent(self):
         terminated = False
         observation = self.env.reset()
-        self.env.render("human")
+        self.env.render()
         while not terminated:
             actions = range(self.env.action_space.n)
             action = self.act_behavior_policy(actions,observation)
 
             observation, reward, terminated, info = self.env.step(action)
-            print(action)
-            self.env.render("human")
-            time.sleep(0.5)
+            self.env.render()
+            time.sleep(1)
 
 
 
 
 
 if __name__ == "__main__":
-    env = gym.make('CliffWalking-v0')
+    env = gym.make("CliffWalking-v0")
     agent = TabularQLearnAgent(env,epsilon=0.1)
 
     agent.initQFuncFromStatesActions(range(env.observation_space.n),range(env.action_space.n))
 
-    lengths, rewards = agent.trainAgent(1000)
+    lengths, rewards = agent.trainAgent(5000)
 
     plt.cla()
     plt.plot(lengths)
-    plt.savefig("ql_lengths.png")
+    plt.savefig("images/ql_lengths.png")
     plt.cla()
     plt.plot(rewards)
-    plt.savefig("ql_rewards.png")
+    plt.savefig("images/ql_rewards.png")
 
     #View performance of greedy agent in environment
     agent.setEpsilon(0)
