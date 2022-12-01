@@ -3,29 +3,13 @@ import numpy as np
 import random
 from matplotlib import pyplot as plt
 import time
+from tabularRLAgent import TabularRLAgent
 
-class TabularQLearnAgent(object):
+class TabularQLearnAgent(TabularRLAgent):
     def __init__(self, env, epsilon=0.2):
         self.q_func = None
         self.env = env
         self.epsilon = epsilon
-        
-    def setQFunc(self,q_func):
-        if type(q_func) == type({}):
-            self.q_func = q_func
-        else:
-            raise Exception(f"Q function should be a dict, not a {type(q_func)}")
-
-    def initQFuncFromStatesActions(self,states,actions, init_val=0):
-        """
-        Initializes Agent's Q function to a specified value at all
-        state action pairs.
-        """
-        self.q_func = {}
-        for action in actions:
-            for state in states:
-                state_action_pair = (state, action)
-                self.q_func[state_action_pair] = init_val
 
     def act_target_policy(self,actions,state):
         """
@@ -78,9 +62,6 @@ class TabularQLearnAgent(object):
         #If you make it out of this loop, something went wrong
         raise Exception("ERROR: Behavior policy failed to select an action.")
 
-    def setEpsilon(self,epsilon):
-        self.epsilon = epsilon
-
     def trainAgent(self, episodes, alpha=0.9,discount=1):
         """
         Trains the agent for the specified amount of episodes, with the specified
@@ -94,7 +75,6 @@ class TabularQLearnAgent(object):
 
         rewards = []
         lengths = []
-        show_next_one = False
         while episode < episodes:
             # self.epsilon -= init_epsilon/episodes
             observation = self.env.reset()
@@ -127,26 +107,14 @@ class TabularQLearnAgent(object):
 
         return lengths, rewards
 
-    def observeAgent(self):
-        terminated = False
-        observation = self.env.reset()
-        self.env.render()
-        while not terminated:
-            actions = range(self.env.action_space.n)
-            action = self.act_behavior_policy(actions,observation)
-
-            observation, reward, terminated, info = self.env.step(action)
-            self.env.render()
-            time.sleep(1)
-
 
 if __name__ == "__main__":
     env = gym.make("CliffWalking-v0")
     agent = TabularQLearnAgent(env,epsilon=0.1)
 
-    agent.initQFuncFromStatesActions(range(env.observation_space.n),range(env.action_space.n))
+    agent.init_qfunc_from_states_actions(range(env.observation_space.n),range(env.action_space.n))
 
-    lengths, rewards = agent.trainAgent(5000)
+    lengths, rewards = agent.train_agent(5000)
 
     plt.cla()
     plt.plot(lengths)
@@ -156,5 +124,5 @@ if __name__ == "__main__":
     plt.savefig("images/ql_rewards.png")
 
     #View performance of greedy agent in environment
-    agent.setEpsilon(0)
-    agent.observeAgent()
+    agent.set_epsilon(0)
+    agent.observe_agent()
