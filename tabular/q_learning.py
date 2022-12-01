@@ -81,7 +81,13 @@ class TabularQLearnAgent(object):
     def setEpsilon(self,epsilon):
         self.epsilon = epsilon
 
-    def trainAgent(self, episodes, alpha=0.05,discount=1):
+    def trainAgent(self, episodes, alpha=0.9,discount=1):
+        """
+        Trains the agent for the specified amount of episodes, with the specified
+        hyperparameters.
+
+        Returns lists of rewards and lengths for which to use in tracking progress of agents.
+        """
         episode = 0
 
         # init_epsilon = self.epsilon
@@ -108,39 +114,14 @@ class TabularQLearnAgent(object):
                 best_q = self.q_func[(observation,greedy_action)]
                 self.q_func[(old_state,behavior_action)] += alpha*(reward+discount*best_q-self.q_func[(old_state,behavior_action)])
 
-
                 traj.append(behavior_action)
                 num_states += 1
                 total_reward += reward
 
-            if episode % 10 == 0:
-                print(f"Episode {episode}: Num states {num_states} with reward {total_reward}")
-                print(self.q_func[(24,0)],self.q_func[(24,1)])
-                rewards.append(total_reward)
-                lengths.append(num_states)
+            rewards.append(total_reward)
+            lengths.append(num_states)
             
-            episode += 1
-
-            # if episode > 100 and total_reward < -50:
-            #     observation = self.env.reset()
-            #     show_next_one = True
-            #     terminated = False
-            #     i = 0
-            #     while not terminated:
-            #         observation, reward, terminated, info = self.env.step(traj[i])
-            #         self.env.render("human")
-            #         i += 1
-            
-            # elif show_next_one:
-            #     i = 0
-            #     show_next_one = False
-            #     observation = self.env.reset()
-            #     terminated = False
-            #     while not terminated:
-            #         observation, reward, terminated, info = self.env.step(traj[i])
-            #         self.env.render("human")
-            #         i += 1
-                    
+            episode += 1     
 
         return lengths, rewards
 
@@ -173,11 +154,10 @@ if __name__ == "__main__":
     plt.plot(lengths)
     plt.savefig("ql_lengths.png")
     plt.cla()
-    rewards = [rewards[0]]*4+rewards
-    smoothed_rewards = []
-    for i in range(4,len(rewards)):
-        smoothed_rewards.append((rewards[i-4]+rewards[i-3]+rewards[i-2]+rewards[i-1]+rewards[i])/5)
     plt.plot(rewards)
-    # plt.ylim(-100,0)
     plt.savefig("ql_rewards.png")
-    # agent.observeAgent()
+
+    #View performance of greedy agent in environment
+    agent.setEpsilon(0)
+    agent.observeAgent()
+
