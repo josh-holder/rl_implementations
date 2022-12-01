@@ -140,9 +140,6 @@ class TabularQLearnAgent(object):
             time.sleep(1)
 
 
-
-
-
 if __name__ == "__main__":
     env = gym.make("CliffWalking-v0")
     agent = TabularQLearnAgent(env,epsilon=0.1)
@@ -161,4 +158,3 @@ if __name__ == "__main__":
     #View performance of greedy agent in environment
     agent.setEpsilon(0)
     agent.observeAgent()
-
