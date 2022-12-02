@@ -1,30 +1,39 @@
-import gym
-import random
-import numpy
-# class TabularRLAgent(object):
-#     def __init__(self, states, actions, q_func=None):
+import time
 
-def greedy_act(actions):
-    """
-    Greedy action selection based on a q or value function
-    """
-    best_q_val = -np.inf
-    best_act = None
-    for action in actions:
-        state_action_pair = (state,action)
+class TabularRLAgent(object):
+    def __init__(self,env, epsilon=0.2):
+        self.q_func = None
+        self.epsilon = epsilon
+        self.env = env
+    
+    def set_qfunc(self,q_func):
+        if type(q_func) == type({}):
+            self.q_func = q_func
+        else:
+            raise Exception(f"Q function should be a dict, not a {type(q_func)}")
 
-        if self.q_func[state_action_pair] > best_q_val:
-            best_q_val = self.q_func[state_action_pair]
-            best_act = action
+    def init_qfunc_from_states_actions(self,states,actions, init_val=0):
+        """
+        Initializes Agent's Q function to a specified value at all
+        state action pairs.
+        """
+        self.q_func = {}
+        for action in actions:
+            for state in states:
+                state_action_pair = (state, action)
+                self.q_func[state_action_pair] = init_val
+    
+    def set_epsilon(self,epsilon):
+        self.epsilon = epsilon
 
-    return action
+    def observe_agent(self):
+        terminated = False
+        observation = self.env.reset()
+        self.env.render('human')
+        while not terminated:
+            actions = range(self.env.action_space.n)
+            action = self.act_behavior_policy(actions,observation)
 
-def e_greedy_act(actions, e):
-    """
-    Given a list of actions to take, returns one with an e-greedy probability.
-    """
-    rand = random.random()
-
-    num_actions = len(actions)
-
-    #find best action
+            observation, reward, terminated, info = self.env.step(action)
+            self.env.render('human')
+            time.sleep(1)

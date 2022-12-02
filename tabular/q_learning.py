@@ -109,7 +109,7 @@ class TabularQLearnAgent(TabularRLAgent):
 
 
 if __name__ == "__main__":
-    env = gym.make("CliffWalking-v0")
+    env = gym.make("Taxi-v3")
     agent = TabularQLearnAgent(env,epsilon=0.1)
 
     agent.init_qfunc_from_states_actions(range(env.observation_space.n),range(env.action_space.n))
